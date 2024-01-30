@@ -1,5 +1,6 @@
 package com.rybindev.cloudstorage.service;
 
+import com.rybindev.cloudstorage.dto.AuthorizedUser;
 import com.rybindev.cloudstorage.dto.CreateUserRequest;
 import com.rybindev.cloudstorage.entiry.User;
 import com.rybindev.cloudstorage.mapper.UserMapper;
@@ -17,7 +18,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -28,13 +28,15 @@ public class UserService implements UserDetailsService {
                 .map(userRepository::saveAndFlush)
                 .map(User::getId)
                 .orElseThrow();
+
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByName(username)
-                .map(user -> new org.springframework.security.core.userdetails.User(
-                        user.getId().toString(),
+                .map(user -> new AuthorizedUser(
+                        user.getId(),
+                        user.getName(),
                         user.getPassword(),
                         Collections.singleton(user.getRole())
                 )).orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: " + username));

@@ -1,23 +1,27 @@
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout::layout(~{::title},~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Registration</title>
 </head>
 <body>
-<div th:replace="~{fragment::logout-bottom}">logout</div>
-
-<form th:action="@{/registration}" method="post" th:object="${user}">
-    <label for="username">Username:
-        <input id="username" type="text" name="username" th:value="*{username}">
-    </label><br>
-    <label for="password">Password:
-        <input id="password" type="password" name="password">
-    </label><br>
-
-    <button type="submit">Register</button>
-</form>
-<div th:if="${errors}">
-    <p style="color: red" th:each="error : ${errors}" th:text="${error.defaultMessage}">Error message</p>
-</div>
+<main>
+    <div class="container">
+        <h1>Регистрация</h1>
+        <form th:action="@{/registration}" method="post" th:object="${user}">
+            <div class="mb-3">
+            <label for="username" class="form-label">Username:</label>
+            <input id="username" type="text" name="username" th:value="*{username}" class="form-control">
+            </div>
+            <div class="mb-3">
+            <label for="password" class="form-label">Password: </label>
+            <input id="password" type="password" name="password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Register</button>
+        </form>
+        <div th:if="${errors}">
+            <p style="color: red" th:each="error : ${errors}" th:text="${error.defaultMessage}">Error message</p>
+        </div>
+    </div>
+</main>
 </body>
 </html>

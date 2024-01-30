@@ -1,23 +1,27 @@
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout::layout(~{::title},~{::main})}">
 <head>
-    <meta charset="UTF-8">
     <title>Login</title>
 </head>
 <body>
-<div th:replace="~{fragment::logout-bottom}">logout</div>
-<form th:action="@{/login}" method="post">
-    <div style="color: red" th:if="${param.error}">
-        Bad credentials
+<main>
+    <div class="container">
+        <h1>Авторизация</h1>
+        <form th:action="@{/login}" id="login-form" method="post">
+            <div style="color: red" th:if="${param.error}">
+                Bad credentials
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username:</label>
+                <input id="username" type="text" name="username" class="form-control">
+            </div>
+            <div class="mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <input id="password" type="password" name="password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Login</button>
+        </form>
     </div>
-
-    <label for="username">Username:
-        <input id="username" type="text" name="username">
-    </label><br>
-    <label for="password">Password:
-        <input id="password" type="password" name="password">
-    </label><br>
-
-    <button type="submit">Login</button>
-</form>
+</main>
 </body>
 </html>

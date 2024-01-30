@@ -1,10 +1,37 @@
 services:
+  application:
+    image: 'sharashbarash/dockerhub:app'
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres/postgres
+      MINIO_URL: http://minio:9000
+    depends_on:
+      - postgres
+      - minio
+    ports:
+      - "8080:8080"
+    networks:
+      - enrollment
+
+
   postgres:
-    image: 'postgres:latest'
-    container_name: postgres
+    image: 'postgres:16-alpine'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5432:5432"
+    networks:
+      - enrollment
+  minio:
+    image: 'bitnami/minio'
+    networks:
+      - enrollment
+    volumes:
+      - ~/data/minio:/data
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: miniominio
+      MINIO_DEFAULT_BUCKETS: data
 
+networks:
+  enrollment:
+    driver: bridge

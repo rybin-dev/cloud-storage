@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UserMapper {
+public class UserMapper implements Mapper<CreateUserRequest, User> {
     private final PasswordEncoder passwordEncoder;
 
     public User map(CreateUserRequest dto) {

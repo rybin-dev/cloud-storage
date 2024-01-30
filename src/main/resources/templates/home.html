@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout::layout(~{::title},~{::main})}">
+<head>
+    <title>Home</title>
+</head>
+<body>
+
+<main>
+    <div class="container">
+        <h1>Проводник</h1>
+
+        <form th:action="@{'/files'}" method="post" enctype="multipart/form-data">
+            <input type="file" name="files" id="files" multiple="" directory="" webkitdirectory="" mozdirectory="">
+            <input type="hidden" name="path" th:value="${path}">
+            <input type="submit" value="Загрузить директорию"/>
+        </form>
+        <form th:action="@{'/files'}" method="post" enctype="multipart/form-data">
+            <input type="file" name="files" id="previewFile" multiple>
+            <input type="hidden" name="path" th:value="${path}">
+            <input type="submit" value="Загрузить файл"/>
+        </form>
+
+        <div class="mb-1">
+            <div th:replace="~{fragment::breadcrumbs}">breadcrumbs</div>
+        </div>
+
+        <div th:replace="~{fragment::add-empty-directory}">add directory</div>
+
+
+        <table class="table">
+            <tbody class="table-group-divider">
+            <tr th:each="item, it : ${files}">
+                <td>
+                    <a th:if="${item.dir}" th:href="@{/(path=${item.path})}" th:text="${item.name}"
+                       style="color: goldenrod">
+                        name
+                    </a>
+                    <a th:unless="${item.dir}" th:href="@{/files(path=${item.path})}" th:text="${item.name}">
+                        name
+                    </a>
+                </td>
+
+                <td>
+                    <div class="d-flex">
+                        <div>
+                            <button type="button"
+                                    class="btn btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
+                                    th:item-path="${item.path}"
+                                    th:item-parent="${path}"
+                                    th:item-name="${item.name}"
+                                    th:form-action="@{(${item.dir} ? '/directories/rename' : '/files/rename')}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-pencil" viewBox="0 0 16 16">
+                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div>
+                            <form th:id="${'delete-' + it.index}"
+                                  th:action="@{(${item.dir} ? '/directories/delete' : '/files/delete')}"
+                                  method="post">
+                                <input type="hidden" name="parent" th:value="${path}">
+                                <input type="hidden" name="path" th:value="${item.path}">
+                            </form>
+                            <button type="submit" th:form="${'delete-' + it.index}" class="btn btn-outline-danger ms-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editModalLabel">Изменить</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{''}" method="post" id="edit-form">
+                        <div class="mb-3">
+                            <label for="newName" class="col-form-label">Название:</label>
+                            <input type="text" name="newName" class="form-control" id="newName">
+                            <input type="hidden" name="parent" id="parent">
+                            <input type="hidden" name="path" id="path">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" form="edit-form" class="btn btn-primary">Сохранить</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            const editModal = document.getElementById('editModal')
+            if (editModal) {
+                editModal.addEventListener('show.bs.modal', event => {
+                    const button = event.relatedTarget
+                    const parent = button.getAttribute('item-parent')
+                    const path = button.getAttribute('item-path')
+                    const name = button.getAttribute('item-name')
+                    const action = button.getAttribute('form-action')
+
+                    editModal.querySelector('.modal-body input#path').value = path
+                    editModal.querySelector('.modal-body input#parent').value = parent
+                    editModal.querySelector('.modal-body input#newName').value = name
+                    editModal.querySelector('.modal-body form#edit-form').action = action
+                })
+            }
+        </script>
+    </div>
+    <!-- Modal -->
+
+</main>
+
+
+</body>
+</html>

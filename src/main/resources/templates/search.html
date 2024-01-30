@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout::layout(~{::title},~{::main})}">
+<head>
+    <title>Search</title>
+</head>
+<body>
+<main>
+    <div class="container">
+            <h1>Поиск файлов</h1>
+
+            <form th:action="@{'/search'}" method="get" >
+                <input type="text" name="query">
+                <input class="button" type="submit" value="Поиск"/>
+            </form>
+            <table class="table">
+                <tbody class="table-group-divider">
+                <tr th:each="item : ${files}">
+                    <td>
+                        <a th:href="@{/files(path=${item.path})}" th:text="${item.path}">name</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+    </div>
+</main>
+</body>
+</html>

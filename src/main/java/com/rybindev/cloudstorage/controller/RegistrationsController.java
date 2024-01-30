@@ -29,7 +29,6 @@ public class RegistrationsController {
     public String register(@ModelAttribute("user") @Validated CreateUserRequest request,
                            BindingResult bindingResult,
                            RedirectAttributes redirectAttributes) {
-
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("user", request);
             redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
